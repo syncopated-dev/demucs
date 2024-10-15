@@ -3,6 +3,7 @@ dora-search>=0.1.12
 diffq>=0.2.1
 einops
 flake8
+flet
 hydra-colorlog>=1.1
 hydra-core>=1.1
 julius>=0.2.3
