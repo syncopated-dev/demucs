@@ -9,10 +9,10 @@ import sys
 from pathlib import Path
 
 from dora.log import fatal
+import flet as ft
 import torch as th
 
 from .api import Separator, save_audio, list_models
-
 from .apply import BagOfModels
 from .htdemucs import HTDemucs
 from .pretrained import add_model_flags, ModelLoadingError
