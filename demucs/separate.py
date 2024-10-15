@@ -105,7 +105,6 @@ def get_parser():
     return parser
 
 
-def main(opts=None):
 def main(
         opts=None,
         progress_bar: ft.ProgressBar = None,
@@ -125,17 +124,19 @@ def main(
         sys.exit(1)
 
     try:
-        separator = Separator(model=args.name,
-                              repo=args.repo,
-                              device=args.device,
-                              shifts=args.shifts,
-                              split=args.split,
-                              overlap=args.overlap,
-                              progress=True,
-                              jobs=args.jobs,
-                              segment=args.segment)
+        separator = Separator(
+            model=args.name,
+            repo=args.repo,
+            device=args.device,
+            shifts=args.shifts,
+            split=args.split,
+            overlap=args.overlap,
+            progress=True,
+            jobs=args.jobs,
+            segment=args.segment,
             progress_bar=progress_bar,
             page=page
+        )
     except ModelLoadingError as error:
         fatal(error.args[0])
 

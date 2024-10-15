@@ -143,17 +143,24 @@ def _replace_dict(_dict: tp.Optional[dict], *subs: tp.Tuple[tp.Hashable, tp.Any]
     return _dict
 
 
-def apply_model(model: tp.Union[BagOfModels, Model],
-                mix: tp.Union[th.Tensor, TensorChunk],
-                shifts: int = 1, split: bool = True,
-                overlap: float = 0.25, transition_power: float = 1.,
-                progress: bool = False, device=None,
-                num_workers: int = 0, segment: tp.Optional[float] = None,
-                pool=None, lock=None,
-                callback: tp.Optional[tp.Callable[[dict], None]] = None,
-                callback_arg: tp.Optional[dict] = None) -> th.Tensor:
+def apply_model(
+        model: tp.Union[BagOfModels, Model],
+        mix: tp.Union[th.Tensor, TensorChunk],
+        shifts: int = 1,
+        split: bool = True,
+        overlap: float = 0.25,
+        transition_power: float = 1.,
+        progress: bool = False,
+        device=None,
+        num_workers: int = 0,
+        segment: tp.Optional[float] = None,
+        pool=None,
+        lock=None,
+        callback: tp.Optional[tp.Callable[[dict], None]] = None,
+        callback_arg: tp.Optional[dict] = None,
         progress_bar: ft.ProgressBar = None,
         page: ft.Page = None
+) -> th.Tensor:
     """
     Apply model to a given mixture.
 
@@ -216,9 +223,14 @@ def apply_model(model: tp.Union[BagOfModels, Model],
             original_model_device = next(iter(sub_model.parameters())).device
             sub_model.to(device)
 
-            res = apply_model(sub_model, mix, **kwargs, callback_arg=callback_arg)
+            res = apply_model(
+                sub_model,
+                mix,
+                **kwargs,
+                callback_arg=callback_arg,
                 progress_bar=progress_bar,
                 page=page
+            )
             out = res
             sub_model.to(original_model_device)
             for k, inst_weight in enumerate(model_weights):
@@ -253,9 +265,14 @@ def apply_model(model: tp.Union[BagOfModels, Model],
                     (lambda d, i=shift_idx: callback(_replace_dict(d, ("shift_idx", i)))
                      if callback else None)
                 )
-            res = apply_model(model, shifted, **kwargs, callback_arg=callback_arg)
+            res = apply_model(
+                model,
+                shifted,
+                **kwargs,
+                callback_arg=callback_arg,
                 progress_bar=progress_bar,
                 page=page
+            )
             shifted_out = res
             out += shifted_out[..., max_shift - offset:]
         out /= shifts
@@ -284,12 +301,18 @@ def apply_model(model: tp.Union[BagOfModels, Model],
         futures = []
         for offset in offsets:
             chunk = TensorChunk(mix, offset, segment_length)
-            future = pool.submit(apply_model, model, chunk, **kwargs, callback_arg=callback_arg,
-                                 callback=(lambda d, i=offset:
-                                           callback(_replace_dict(d, ("segment_offset", i)))
-                                           if callback else None))
+            future = pool.submit(
+                apply_model,
+                model,
+                chunk,
                 progress_bar=progress_bar,
                 page=page,
+                **kwargs,
+                callback_arg=callback_arg,
+                callback=(
+                    lambda d, i=offset: callback(_replace_dict(d, ("segment_offset", i))) if callback else None
+                )
+            )
             futures.append((future, offset))
             offset += segment_length
         if progress:

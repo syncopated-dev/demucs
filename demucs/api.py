@@ -245,7 +245,9 @@ class Separator:
         return wav
 
     def separate_tensor(
-        self, wav: th.Tensor, sr: Optional[int] = None
+        self,
+        wav: th.Tensor,
+        sr: Optional[int] = None
     ) -> Tuple[th.Tensor, Dict[str, th.Tensor]]:
         """
         Separate a loaded tensor.
