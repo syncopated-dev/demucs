@@ -31,8 +31,9 @@ for line in open('demucs/__init__.py'):
 
 
 def load_requirements(name):
-    required = [i.strip() for i in open(HERE / name)]
-    required = [i for i in required if not i.startswith('#')]
+    with open(HERE / name) as file:
+        required = [i.strip() for i in file if not i.startswith("-")]
+        required = [i for i in required if not i.startswith('#')]
     return required
 
 
