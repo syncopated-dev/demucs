@@ -5,7 +5,7 @@
 # LICENSE file in the root directory of this source tree.
 """
 Code to apply a model to a mix. It will handle chunking with overlaps and
-inteprolation between chunks, as well as the "shift trick".
+interpolation between chunks, as well as the "shift trick".
 """
 from concurrent.futures import ThreadPoolExecutor
 import copy
@@ -156,7 +156,7 @@ def apply_model(model: tp.Union[BagOfModels, Model],
 
     Args:
         shifts (int): if > 0, will shift in time `mix` by a random amount between 0 and 0.5 sec
-            and apply the oppositve shift to the output. This is repeated `shifts` time and
+            and apply the opposite shift to the output. This is repeated `shifts` time and
             all predictions are averaged. This effectively makes the model time equivariant
             and improves SDR by up to 0.2 points.
         split (bool): if True, the input will be broken down in 8 seconds extracts
@@ -167,7 +167,7 @@ def apply_model(model: tp.Union[BagOfModels, Model],
             execute the computation, otherwise `mix.device` is assumed.
             When `device` is different from `mix.device`, only local computations will
             be on `device`, while the entire tracks will be stored on `mix.device`.
-        num_workers (int): if non zero, device is 'cpu', how many threads to
+        num_workers (int): if non-zero, device is 'cpu', how many threads to
             use in parallel.
         segment (float or None): override the model segment parameter.
     """
@@ -200,7 +200,7 @@ def apply_model(model: tp.Union[BagOfModels, Model],
     res: tp.Union[float, th.Tensor]
     if isinstance(model, BagOfModels):
         # Special treatment for bag of model.
-        # We explicitely apply multiple times `apply_model` so that the random shifts
+        # We explicitly apply multiple times `apply_model` so that the random shifts
         # are different for each model.
         estimates: tp.Union[float, th.Tensor] = 0.
         totals = [0.] * len(model.sources)

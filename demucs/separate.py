@@ -209,7 +209,7 @@ def main(opts=None):
             )
             stem.parent.mkdir(parents=True, exist_ok=True)
             save_audio(res.pop(args.stem), str(stem), **kwargs)
-            # Warning : after poping the stem, selected stem is no longer in the dict 'res'
+            # Warning : after popping the stem, selected stem is no longer in the dict 'res'
             if args.other_method == "add":
                 other_stem = th.zeros_like(next(iter(res.values())))
                 for i in res.values():
