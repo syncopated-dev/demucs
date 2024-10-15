@@ -106,6 +106,11 @@ def get_parser():
 
 
 def main(opts=None):
+def main(
+        opts=None,
+        progress_bar: ft.ProgressBar = None,
+        page: ft.Page = None,
+):
     parser = get_parser()
     args = parser.parse_args(opts)
     if args.list_models:
@@ -129,6 +134,8 @@ def main(opts=None):
                               progress=True,
                               jobs=args.jobs,
                               segment=args.segment)
+            progress_bar=progress_bar,
+            page=page
     except ModelLoadingError as error:
         fatal(error.args[0])
 

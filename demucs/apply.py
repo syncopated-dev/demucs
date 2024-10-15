@@ -152,6 +152,8 @@ def apply_model(model: tp.Union[BagOfModels, Model],
                 pool=None, lock=None,
                 callback: tp.Optional[tp.Callable[[dict], None]] = None,
                 callback_arg: tp.Optional[dict] = None) -> th.Tensor:
+        progress_bar: ft.ProgressBar = None,
+        page: ft.Page = None
     """
     Apply model to a given mixture.
 
@@ -215,6 +217,8 @@ def apply_model(model: tp.Union[BagOfModels, Model],
             sub_model.to(device)
 
             res = apply_model(sub_model, mix, **kwargs, callback_arg=callback_arg)
+                progress_bar=progress_bar,
+                page=page
             out = res
             sub_model.to(original_model_device)
             for k, inst_weight in enumerate(model_weights):
@@ -250,6 +254,8 @@ def apply_model(model: tp.Union[BagOfModels, Model],
                      if callback else None)
                 )
             res = apply_model(model, shifted, **kwargs, callback_arg=callback_arg)
+                progress_bar=progress_bar,
+                page=page
             shifted_out = res
             out += shifted_out[..., max_shift - offset:]
         out /= shifts
@@ -282,6 +288,8 @@ def apply_model(model: tp.Union[BagOfModels, Model],
                                  callback=(lambda d, i=offset:
                                            callback(_replace_dict(d, ("segment_offset", i)))
                                            if callback else None))
+                progress_bar=progress_bar,
+                page=page,
             futures.append((future, offset))
             offset += segment_length
         if progress:
@@ -292,6 +300,13 @@ def apply_model(model: tp.Union[BagOfModels, Model],
             except Exception:
                 pool.shutdown(wait=True, cancel_futures=True)
                 raise
+
+            if progress_bar:
+                pb_value = futures.n / futures.total
+                if pb_value:
+                    progress_bar.value = pb_value
+                    page.update()
+
             chunk_length = chunk_out.shape[-1]
             out[..., offset:offset + segment_length] += (
                 weight[:chunk_length] * chunk_out).to(mix.device)
