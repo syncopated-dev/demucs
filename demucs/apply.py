@@ -13,7 +13,6 @@ import random
 from threading import Lock
 import typing as tp
 
-import flet as ft
 import torch as th
 from torch import nn
 from torch.nn import functional as F
@@ -157,9 +156,7 @@ def apply_model(
         pool=None,
         lock=None,
         callback: tp.Optional[tp.Callable[[dict], None]] = None,
-        callback_arg: tp.Optional[dict] = None,
-        progress_bar: ft.ProgressBar = None,
-        page: ft.Page = None
+        callback_arg: tp.Optional[dict] = None
 ) -> th.Tensor:
     """
     Apply model to a given mixture.
@@ -227,9 +224,7 @@ def apply_model(
                 sub_model,
                 mix,
                 **kwargs,
-                callback_arg=callback_arg,
-                progress_bar=progress_bar,
-                page=page
+                callback_arg=callback_arg
             )
             out = res
             sub_model.to(original_model_device)
@@ -269,9 +264,7 @@ def apply_model(
                 model,
                 shifted,
                 **kwargs,
-                callback_arg=callback_arg,
-                progress_bar=progress_bar,
-                page=page
+                callback_arg=callback_arg
             )
             shifted_out = res
             out += shifted_out[..., max_shift - offset:]
@@ -305,8 +298,6 @@ def apply_model(
                 apply_model,
                 model,
                 chunk,
-                progress_bar=progress_bar,
-                page=page,
                 **kwargs,
                 callback_arg=callback_arg,
                 callback=(
@@ -323,13 +314,6 @@ def apply_model(
             except Exception:
                 pool.shutdown(wait=True, cancel_futures=True)
                 raise
-
-            if progress_bar:
-                pb_value = futures.n / futures.total
-                if pb_value:
-                    progress_bar.value = pb_value
-                    page.update()
-
             chunk_length = chunk_out.shape[-1]
             out[..., offset:offset + segment_length] += (
                 weight[:chunk_length] * chunk_out).to(mix.device)

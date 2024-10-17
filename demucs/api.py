@@ -25,7 +25,6 @@ from pathlib import Path
 from typing import Optional, Callable, Dict, Tuple, Union
 
 from dora.log import fatal
-import flet as ft
 import torch as th
 import torchaudio as ta
 
@@ -64,9 +63,7 @@ class Separator:
         jobs: int = 0,
         progress: bool = False,
         callback: Optional[Callable[[dict], None]] = None,
-        callback_arg: Optional[dict] = None,
-        progress_bar: ft.ProgressBar = None,
-        page: ft.Page = None
+        callback_arg: Optional[dict] = None
     ):
         """
         `class Separator`
@@ -123,9 +120,6 @@ class Separator:
         self.update_parameter(device=device, shifts=shifts, overlap=overlap, split=split,
                               segment=segment, jobs=jobs, progress=progress, callback=callback,
                               callback_arg=callback_arg)
-
-        self.progress_bar = progress_bar
-        self.page = page
 
     def update_parameter(
         self,
@@ -288,9 +282,7 @@ class Separator:
                 callback_arg=_replace_dict(
                     self._callback_arg, ("audio_length", wav.shape[1])
                 ),
-                progress=self._progress,
-                progress_bar=self.progress_bar,
-                page=self.page
+                progress=self._progress
             )
         if out is None:
             raise KeyboardInterrupt

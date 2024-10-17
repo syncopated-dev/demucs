@@ -9,7 +9,6 @@ import sys
 from pathlib import Path
 
 from dora.log import fatal
-import flet as ft
 import torch as th
 
 from .api import Separator, save_audio, list_models
@@ -105,12 +104,7 @@ def get_parser():
     return parser
 
 
-def main(
-        opts=None,
-        progress_bar: ft.ProgressBar = None,
-        page: ft.Page = None,
-        include_model_name=False
-):
+def main(opts=None):
     parser = get_parser()
     args = parser.parse_args(opts)
     if args.list_models:
@@ -134,9 +128,7 @@ def main(
             overlap=args.overlap,
             progress=True,
             jobs=args.jobs,
-            segment=args.segment,
-            progress_bar=progress_bar,
-            page=page
+            segment=args.segment
         )
     except ModelLoadingError as error:
         fatal(error.args[0])
@@ -163,11 +155,7 @@ def main(
                 stem=args.stem, sources=", ".join(separator.model.sources)
             )
         )
-
-    # Excluding model name from output path to keep things simple for users
-    # I expect most people to use default settings, and won't care about model types
-    # Advanced option toggle to include this if desired
-    out = (args.out / args.name) if include_model_name else args.out
+    out = args.out / args.name
     out.mkdir(parents=True, exist_ok=True)
     print(f"Separated tracks will be stored in {out.resolve()}")
     for track in args.tracks:
