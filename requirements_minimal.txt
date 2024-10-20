@@ -8,5 +8,5 @@ openunmix
 pyyaml
 tqdm
 --index-url https://download.pytorch.org/whl/cu118
-torch>=1.8.1
-torchaudio>=0.8
+torch==2.2.0
+torchaudio==2.2.0
